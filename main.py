@@ -56,8 +56,11 @@ def is_time_between(begin_time, end_time, check_time=None):
         return check_time >= begin_time or check_time <= end_time
 
 
-current_time = datetime.datetime.now().strftime("%H:%M:%S")
+current_time = datetime.datetime.now()
 
+current_time = current_time - datetime.timedelta(minutes=10)
+
+current_time = current_time.strftime("%H:%M:%S")
 flag = True
 while flag:
     for i, schedule in enumerate(schedules):
