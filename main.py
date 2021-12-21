@@ -10,7 +10,10 @@ import sendemail
 
 def findValues(word):
     try:
-        temp = [config(f'{word}{i}') for i in range(1, 50) if config(f'{word}{i}')]
+        temp = []
+        for i in range(1, 50):
+            if config(f'{word}{i}'):
+                temp.append(config(f'{word}{i}'))
     except UndefinedValueError as e:
         pass
     return temp
