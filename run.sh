@@ -6,3 +6,5 @@ if [[ "$(docker images -q emailfetcher:1.0 2> /dev/null)" == "" ]]; then
 else
   docker run emailfetcher:1.0
 fi
+
+docker rmi -f emailfetcher:1.0
