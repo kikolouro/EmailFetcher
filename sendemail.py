@@ -24,8 +24,8 @@ def sendEmail(receivers, senderdata, data, port=465, smtpserver='smtp.gmail.com'
         SUBJECT = f"{total} Errors on log File in 4 hours"
         TEXT = f"There was {total} errors on log files in the last 4 hours. Here is a summary of them: \n{text}"
     else:
-        SUBJECT = f"There was no erros on log files"
-        TEXT = f"There was no errors on log files in the last 4 hours."
+        SUBJECT = 'There was no erros on log files'
+        TEXT = 'There was no errors on log files in the last 4 hours.'
 
     message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
     context = ssl.create_default_context()
