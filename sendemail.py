@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 import os, sys, json
-
+from decouple import config
 def render_template(template, **kwargs):
     ''' renders a Jinja template into HTML '''
     # check if template exists
@@ -14,6 +14,7 @@ def render_template(template, **kwargs):
     if not os.path.exists(template):
         print('No template file present: %s' % template)
         sys.exit()
+
 
     import jinja2
     templateLoader = jinja2.FileSystemLoader(searchpath="/")
@@ -25,25 +26,37 @@ def render_template(template, **kwargs):
 def dataHandler(data, title):
     total = 0
     final = {'title': title, 'logs': []}
-    for log in data:
-        if data[log]['count'] != 0:
-            total += data[log]['count']
-            errors = []
-            for error in data[log]['errors']:
-                temp = error.split(' ', 5)
-                timestamp = f"{temp[0]} {temp[1]}" 
-                module = temp[4]
-                message = temp[5][2:]
-                errors.append({
-                    'timestamp': timestamp,
-                    'module': module,
-                    'message': message
+    if 'log' in title:
+            
+        for log in data:
+            if data[log]['count'] != 0:
+                total += data[log]['count']
+                errors = []
+                for error in data[log]['errors']:
+                    temp = error.split(' ', 5)
+                    timestamp = f"{temp[0]} {temp[1]}" 
+                    module = temp[4]
+                    message = temp[5][2:]
+                    errors.append({
+                        'timestamp': timestamp,
+                        'module': module,
+                        'message': message
+                    })
+                final['logs'].append( {
+                    'log': log,
+                    'errors': errors
                 })
+    else:
+        if data['count'] != 0:
+            total += data['count']
+            errors = []
+            for error in data['errors']:
+                errors.append(error)
             final['logs'].append( {
-                'log': log,
+                'log': error['host'],
                 'errors': errors
             })
-    #print(final)
+        #print(final)
     return total, final
 
 
@@ -63,12 +76,12 @@ def sendEmail(receivers, senderdata, data, title, port=465, smtpserver='smtp.gma
     msg.attach(MIMEText(html, 'html'))
 
     context = ssl.create_default_context()
+    if int(config('NOERRORMAIL')) != 0:
+        with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
+            server.login(sender_email, password)
+            for receiver in receivers:
+                msg['To'] = ''.join(receiver)
 
-    with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
-        server.login(sender_email, password)
-        for receiver in receivers:
-            msg['To'] = ''.join(receiver)
-
-            server.sendmail(sender_email, receiver,
-                            msg.as_string())
+                server.sendmail(sender_email, receiver,
+                                msg.as_string())
     return "Success"

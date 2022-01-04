@@ -9,7 +9,6 @@ import sys
 from functions import is_time_between, isToday
 import sendemail
 
-
 def BodyTransformlog(body):
 
     temp = body.split("Operational data: ", 1)[1]
@@ -90,10 +89,8 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
     else:
         try:
             _, emails = imap_ssl.search(None, "ALL")
-            print(emails[0])
             for x in emails[0].decode('utf-8').split(' '):
                 result, data = imap_ssl.fetch(x, "(RFC822)")
-                print(x)
                 raw_email = data[0][1]
                 # print(raw_email)
                 raw_email_string = raw_email.decode('utf-8')
@@ -108,9 +105,7 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
                         str(local_date.strftime("%a, %d %b %Y %H:%M:%S")))
                     message_time = "%s" % (
                         str(local_date.strftime("%H:%M:%S")))
-                print(datetime.datetime.strptime(
-                    message_time, '%H:%M:%S').time())
-                print(email_message['Subject'])
+                #print(email_message['Subject'])
                 if is_time_between(schedules[timestamp][0], schedules[timestamp][1], datetime.datetime.strptime(message_time, '%H:%M:%S').time()) and isToday(local_date.date()):
 
                     email_from = str(email.header.make_header(
@@ -119,7 +114,7 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
                         email.header.decode_header(email_message['To'])))
                     subject = str(email.header.make_header(
                         email.header.decode_header(email_message['Subject'])))
-                    if " log" in email_message['Subject']:
+                    if " Log" not in email_message['Subject'] and " log" not in email_message['Subject']:
                         for part in email_message.walk():
                             if part.get_content_type() == "text/plain":
                                 body = part.get_payload(decode=True)

@@ -9,7 +9,7 @@ import sys
 from emailhandler import emailHandler
 from functions import is_time_between
 import sendemail
-
+import pprint
 
 
 def findValues(word):
@@ -97,13 +97,14 @@ tomorrow = (date.today() + datetime.timedelta(days=1)).strftime("%d-%b-%Y")
 
 logs = findValues('LOG')
 recipients = findValues('RECIPIENT')
+pp = pprint.PrettyPrinter(indent=4)
 
 for title in titles:
     if 'log' in title:
-        continue
+        
         print('log')
         obj = init(logs)    
-        #obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp -1, title, islog=True)
+        obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp -1, title, islog=True)
     elif 'zabbix' in title:
         print('zabbix')
         obj = {
@@ -111,8 +112,9 @@ for title in titles:
             "errors": []
         }
         obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, title, islog=False)
-        print(obj)
-    #sendemail.sendEmail(recipients, {'email': config(
-    #'SENDER_EMAIL'), 'password': config('SENDER_PASSWORD')}, obj, title)
+        
+        pp.pprint(obj)
+    sendemail.sendEmail(recipients, {'email': config(
+    'SENDER_EMAIL'), 'password': config('SENDER_PASSWORD')}, obj, title)
 
 imap_ssl.logout()
