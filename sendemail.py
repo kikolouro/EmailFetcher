@@ -1,38 +1,74 @@
+from datetime import time
 import smtplib
 import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.header import Header
+from email.utils import formataddr
+import os, sys, json
 
+def render_template(template, **kwargs):
+    ''' renders a Jinja template into HTML '''
+    # check if template exists
+    #print(os.path.exists(template))
+    if not os.path.exists(template):
+        print('No template file present: %s' % template)
+        sys.exit()
 
-def dataHandler(data):
+    import jinja2
+    templateLoader = jinja2.FileSystemLoader(searchpath="/")
+    templateEnv = jinja2.Environment(loader=templateLoader)
+    templ = templateEnv.get_template(template)
+    print(templ.render(**kwargs))
+    return templ.render(**kwargs)
+
+def dataHandler(data, title):
     total = 0
-    text = ''
+    final = {'title': title, 'logs': []}
     for log in data:
         if data[log]['count'] != 0:
-            total += data[log]['count'] 
-            text += f"Error Count on {log} log: {data[log]['count']}\n{data[log]['errors']}"
+            total += data[log]['count']
+            errors = []
+            for error in data[log]['errors']:
+                temp = error.split(' ', 5)
+                timestamp = f"{temp[0]} {temp[1]}" 
+                module = temp[4]
+                message = temp[5][2:]
+                errors.append({
+                    'timestamp': timestamp,
+                    'module': module,
+                    'message': message
+                })
+            final['logs'].append( {
+                'log': log,
+                'errors': errors
+            })
+    #print(final)
+    return total, final
 
-    return total, text
 
-def sendEmail(receivers, senderdata, data, port=465, smtpserver='smtp.gmail.com'):
+def sendEmail(receivers, senderdata, data, title, port=465, smtpserver='smtp.gmail.com'):
     sender_email = senderdata['email']
     password = senderdata['password']
-    total, text = dataHandler(data)
-    message = f"""\
-    Subject: {total} Errors on log File in 4 hours
-
-    There was {total} errors on log files in the last 4 hours. Here is a summary of them: \n{text}""".encode('utf-8')
+    total, bodydata = dataHandler(data, title)
     if total != 0:
         SUBJECT = f"{total} Errors on log File in 4 hours"
-        TEXT = f"There was {total} errors on log files in the last 4 hours. Here is a summary of them: \n{text}"
     else:
-        SUBJECT = f"There was no erros on log files"
-        TEXT = f"There was no errors on log files in the last 4 hours."
+        SUBJECT = f"There was no errors on log files"
 
-    message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+    msg = MIMEMultipart('alternative')
+    msg['From']    = sender_email
+    msg['Subject'] = SUBJECT
+    html = render_template(f'{os.getcwd()}/template.j2', data=bodydata)
+    msg.attach(MIMEText(html, 'html'))
+
     context = ssl.create_default_context()
 
     with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
         server.login(sender_email, password)
         for receiver in receivers:
+            msg['To'] = ''.join(receiver)
+
             server.sendmail(sender_email, receiver,
-                            message.encode('utf-8'))
+                            msg.as_string())
     return "Success"

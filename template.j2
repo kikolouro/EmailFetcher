@@ -1,0 +1,81 @@
+<html>
+<style type="text/css">
+@font-face {
+  font-family: 'Open Sans';
+  font-style: large;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(http://fonts.gstatic.com/s/opensans/v13/DXI1ORHCpsQm3Vp6mXoaTa-j2U0lmluP9RWlSytm3ho.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  background-color: red;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+.body {
+    width: 90%;
+    margin: auto;
+    font-family: 'Open Sans', 'Helvetica', sans-serif; 
+    font-size: 14pt;
+    color: #075D72;
+}
+a:link { color: #B40057; text-decoration: underline}
+a:visited { color: #542A95; text-decoration: none}
+a:hover { color: #B40057; background-color:#C4FFF9; text-decoration: underline }
+</style>
+
+<div class="body">
+{% if 'log' in data['title'] %}
+    <h1>{{ data['title'] }}</h1>
+
+    {% if data | length > 0%}
+
+        {% for log in data['logs'] %}
+
+            <h3>{{log['log']}}</h3>
+            <table border="1">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Module</th>
+                    <th>Message</th>
+                </tr>
+                {% for temp in log['errors'] %}
+                    <tr>
+                        <td>{{temp['timestamp']}}</td>
+                        <td>{{temp['module']}}</td>
+                        <td>{{temp['message']}}</td>                
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}        
+    {% else %}
+        <p> There was no errors</p>
+    {% endif %}
+{% else %}
+
+
+    <h1>{{ data['title'] }}</h1>
+
+    {% if data | length > 0%}
+
+        <p>{{data}}</p>
+    {% else %}
+        <p> There was no problems</p>
+    {% endif %}
+{% endif %}
+
+</div>
+
+<p><br><br>
+</html>
