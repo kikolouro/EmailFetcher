@@ -30,10 +30,12 @@ def sendEmail(receivers, senderdata, data, port=465, smtpserver='smtp.gmail.com'
     message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
     context = ssl.create_default_context()
 
-    if int(config('NOERRORMAIL')) != 0:
-        with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
-            server.login(sender_email, password)
-            for receiver in receivers:
-                server.sendmail(sender_email, receiver,
-                                message.encode('utf-8'))
+    if SUBJECT == "There was no erros on log files":
+        if int(config('NOERRORMAIL')) == 0:
+            return
+    with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
+        server.login(sender_email, password)
+        for receiver in receivers:
+            server.sendmail(sender_email, receiver,
+                            message.encode('utf-8'))
     return "Success"
