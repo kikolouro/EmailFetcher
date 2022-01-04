@@ -101,7 +101,6 @@ pp = pprint.PrettyPrinter(indent=4)
 
 for title in titles:
     if 'log' in title:
-        
         print('log')
         obj = init(logs)    
         obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp -1, title, islog=True)

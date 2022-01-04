@@ -20,9 +20,18 @@ def BodyTransformlog(body):
 def BodyTransformZabbix(body):
     id = body.split("Original problem ID: ", 1)[1].split("\r\n")[0]
     name = body.split("Problem name: ", 1)[1].split("\r\n")[0]
-    host = body.split("Original problem ID: ", 1)[1].split("\r\n")[0]
-    severity = body.split("Original problem ID: ", 1)[1].split("\r\n")[0]
+    host = body.split("Host: ", 1)[1].split("\r\n")[0]
+    severity = body.split("Severity: ", 1)[1].split("\r\n")[0]
     data = body.split("Operational data: ", 1)[1].split("\r\n")[0]
+
+    
+    print({
+        "id": id,
+        "name": name,
+        "host": host,
+        "severity": severity,
+        "data": data
+    })
 
     return {
         "id": id,
@@ -40,7 +49,6 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
             try:
                 emails = imap_ssl.search(
                     None, f'(SUBJECT "Problem: Errors on {logs[i]} log" SINCE "{today} BEFORE {tomorrow}")')
-                print(emails)
 
                 for x in emails[1][0].decode('utf-8').split(' '):
 
@@ -119,8 +127,6 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
                             if part.get_content_type() == "text/plain":
                                 body = part.get_payload(decode=True)
                                 obj['count'] += 1
-                                print(BodyTransformZabbix(
-                                    body.decode('utf-8')))
                                 obj['errors'].append(
                                     BodyTransformZabbix(body.decode('utf-8')))
                     else:

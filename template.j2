@@ -11,7 +11,6 @@ table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
-  background-color: red;
 }
 
 td, th {
@@ -28,7 +27,6 @@ tr:nth-child(even) {
     margin: auto;
     font-family: 'Open Sans', 'Helvetica', sans-serif; 
     font-size: 14pt;
-    color: #075D72;
 }
 a:link { color: #B40057; text-decoration: underline}
 a:visited { color: #542A95; text-decoration: none}
@@ -52,9 +50,9 @@ a:hover { color: #B40057; background-color:#C4FFF9; text-decoration: underline }
                 </tr>
                 {% for temp in log['errors'] %}
                     <tr>
-                        <td>{{temp['timestamp']}}</td>
-                        <td>{{temp['module']}}</td>
-                        <td>{{temp['message']}}</td>                
+                        <td style="padding: 5px;">{{temp['timestamp']}}</td>
+                        <td style="padding: 5px;">{{temp['module']}}</td>
+                        <td style="padding: 5px;">{{temp['message']}}</td>                
                     </tr>
                 {% endfor %}
             </table>
@@ -66,10 +64,37 @@ a:hover { color: #B40057; background-color:#C4FFF9; text-decoration: underline }
 
 
     <h1>{{ data['title'] }}</h1>
-
-    {% if data | length > 0%}
-
-        <p>{{data}}</p>
+    {% if data['logs'] | length > 0%}
+            <table border="1">
+                <tr>
+                    <th>Problem ID</th>
+                    <th>Name</th>
+                    <th>Host</th>
+                    <th>Severity</th>
+                    <th>Data</th>
+                </tr>
+                {% for temp in data['logs'][0]['errors'] %}
+                    <tr>
+                        <td style="font-weight: bold; padding: 5px;">{{temp['id']}}</td>
+                        <td style="padding: 5px;">{{temp['name']}}</td>
+                        <td style="padding: 5px;">{{temp['host']}}</td>
+                        {% if temp['severity'] == 'Disaster'%}
+                            <td style="color: #e45959; padding: 5px;">{{temp['severity']}}</td>
+                        {% elif temp['severity'] == 'High'%}
+                            <td style="color: #e97659; padding: 5px;">{{temp['severity']}}</td>
+                        {% elif temp['severity'] == 'Average'%}
+                            <td style="color: #ffa059; padding: 5px;">{{temp['severity']}}</td>
+                        {% elif temp['severity'] == 'Warning'%}
+                            <td style="color: #ffc859; padding: 5px;">{{temp['severity']}}</td>
+                        {% elif temp['severity'] == 'Information'%}
+                            <td style="color: #7499ff; padding: 5px;">{{temp['severity']}}</td>
+                        {% else %}
+                            <td style="color: #e45959; padding: 5px;">{{temp['severity']}}</td>
+                        {% endif %}
+                        <td style="padding: 5px;">{{temp['data']}}</td>                
+                    </tr>
+                {%endfor%}
+            </table>
     {% else %}
         <p> There was no problems</p>
     {% endif %}
