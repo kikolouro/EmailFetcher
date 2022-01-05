@@ -101,18 +101,16 @@ pp = pprint.PrettyPrinter(indent=4)
 
 for title in titles:
     if 'log' in title:
-        print('log')
         obj = init(logs)    
         obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp -1, title, islog=True)
     elif 'zabbix' in title:
-        print('zabbix')
         obj = {
             "count": 0,
             "errors": []
         }
         obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, title, islog=False)
         
-        pp.pprint(obj)
+        #pp.pprint(obj)
     sendemail.sendEmail(recipients, {'email': config(
     'SENDER_EMAIL'), 'password': config('SENDER_PASSWORD')}, obj, title)
 

@@ -1,3 +1,3 @@
 #!/bin/bash
-
-docker image rm -f emailfetcher:1.0 
+source .env
+docker image rm -f emailfetcher:$APPVERSION 

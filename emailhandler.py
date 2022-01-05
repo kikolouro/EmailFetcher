@@ -25,13 +25,6 @@ def BodyTransformZabbix(body):
     data = body.split("Operational data: ", 1)[1].split("\r\n")[0]
 
     
-    print({
-        "id": id,
-        "name": name,
-        "host": host,
-        "severity": severity,
-        "data": data
-    })
 
     return {
         "id": id,

@@ -88,9 +88,8 @@ def sendEmail(receivers, senderdata, data, title, port=465, smtpserver='smtp.gma
     msg['Subject'] = SUBJECT
     html = render_template(f'{os.getcwd()}/template.j2', data=bodydata)
     msg.attach(MIMEText(html, 'html'))
-    print(SUBJECT)
     context = ssl.create_default_context()
-    if SUBJECT == "There was no erros on log files":
+    if total == 0:
         if int(config('NOERRORMAIL')) == 0:
             return
     with smtplib.SMTP_SSL(smtpserver, port, context=context) as server:
