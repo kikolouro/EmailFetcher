@@ -59,7 +59,7 @@ titles = [
 
 current_time = datetime.datetime.now()
 
-current_time = current_time - datetime.timedelta(minutes=10)
+current_time = current_time - datetime.timedelta(minutes=1)
 
 current_time = current_time.strftime("%H:%M:%S")
 flag = True
@@ -102,7 +102,9 @@ pp = pprint.PrettyPrinter(indent=4)
 for title in titles:
     if 'log' in title:
         obj = init(logs)    
-        obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp -1, title, islog=True)
+        obj = emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, title, islog=True)
+
+        #pp.pprint(obj)
     elif 'zabbix' in title:
         obj = {
             "count": 0,
