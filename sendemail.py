@@ -41,6 +41,7 @@ def dataHandler(data, title):
                 errors = []
                 for error in data[log]['errors']:
                     temp = error.split(' ', 5)
+                    print(temp)
                     timestamp = f"{temp[0]} {temp[1]}"
                     module = temp[4]
                     message = temp[5][2:]
