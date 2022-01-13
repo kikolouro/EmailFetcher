@@ -10,8 +10,10 @@ from functions import is_time_between, isToday
 import sendemail
 
 def BodyTransformlog(body):
+    print(body)
+    
+    temp = body.split("Log Value: ", 1)[1]
 
-    temp = body.split("Operational data: ", 1)[1]
     body = temp.split("\r\n")[0]
 
     return str(body) + "\n"
@@ -41,14 +43,12 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
         for i, log in enumerate(logs):
             try:
                 emails = imap_ssl.search(
-                    None, f'(SUBJECT "Problem: Errors on {logs[i]} log" SINCE "{today} BEFORE {tomorrow}")')
-
+                    None, f'(SUBJECT "Error on {logs[i]} Log" SINCE "{today} BEFORE {tomorrow}")')
                 for x in emails[1][0].decode('utf-8').split(' '):
-
+                    
                     result, data = imap_ssl.fetch(x, "(RFC822)")
 
                     raw_email = data[0][1]
-
                     raw_email_string = raw_email.decode('utf-8')
                     email_message = email.message_from_string(raw_email_string)
 
@@ -64,7 +64,7 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
                             str(local_date.strftime("%H:%M:%S")))
 
                     if is_time_between(schedules[timestamp][0], schedules[timestamp][1], datetime.datetime.strptime(message_time, '%H:%M:%S').time()):
-
+                        
                         email_from = str(email.header.make_header(
                             email.header.decode_header(email_message['From'])))
                         email_to = str(email.header.make_header(
@@ -73,14 +73,17 @@ def emailHandler(obj, logs, today, tomorrow, schedules, imap_ssl, timestamp, tit
                             email.header.decode_header(email_message['Subject'])))
 
                         for part in email_message.walk():
+                            
                             if part.get_content_type() == "text/plain":
                                 body = part.get_payload(decode=True)
+                                print(subject)
+                                print(f"{body=}")
 
                                 obj[log]['count'] += 1
 
                                 obj[log]['errors'].append(
                                     BodyTransformlog(body.decode('utf-8')))
-
+                                print(obj)
                             else:
                                 continue
             except Exception as e:
