@@ -36,6 +36,7 @@ def dataHandler(data, title):
     if 'log' in title:
 
         for log in data:
+            #print(log)
             if data[log]['count'] != 0:
                 total += data[log]['count']
                 errors = []
