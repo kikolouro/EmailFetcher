@@ -45,7 +45,7 @@ def dataHandler(data, title):
                     print(temp)
                     timestamp = f"{temp[0]} {temp[1]}"
                     module = temp[4]
-                    message = temp[5][2:]
+                    message = temp[5][2:].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                     errors.append({
                         'timestamp': timestamp,
                         'module': module,
